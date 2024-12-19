@@ -1,0 +1,47 @@
+!pip install textblob nltk vaderSentiment
+from textblob import TextBlob
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+analyzer = SentimentIntensityAnalyzer()
+def detect_emotion_vader(text):
+    sentiment = analyzer.polarity_scores(text)
+    compound_score = sentiment['compound']   
+    if compound_score >= 0.05:
+        return "Positive"
+    elif compound_score <= -0.05:
+        return "Negative"
+    else:
+        return "Neutral"
+def detect_emotion_textblob(text):
+    surprise_keywords = ["OMG", "surprise", "wow", "amazing", "unbelievable", "shocked", "incredible", "wow"]
+    angry_keywords = ["angry", "furious", "rage", "enraged", "irritated", "mad", "upset", "fuming"]
+    if any(keyword in text.lower() for keyword in surprise_keywords):
+        return "Surprise"
+    if any(keyword in text.lower() for keyword in angry_keywords):
+        return "Angry"
+    blob = TextBlob(text)
+    polarity = blob.sentiment.polarity
+    subjectivity = blob.sentiment.subjectivity
+    if polarity > 0.5:
+        return "Happy"
+    elif polarity < -0.5:
+        return "Sad"
+    elif subjectivity > 0.5:
+        return "Surprise"  
+    else:
+        return "Neutral"
+sample_texts = [
+    "I am so happy and excited about this event!",
+    "I feel terrible, everything is going wrong.",
+    "I am so angry about what happened today!",
+    "This is the best day ever!",
+    "I don't know how to feel, i'm so irritated.",
+    "surprise happy birthday",
+    "I am furious about how they treated me!"
+]
+for text in sample_texts:
+    emotion_vader = detect_emotion_vader(text)
+    emotion_blob = detect_emotion_textblob(text)
+    print("Text: ", text)
+    print("Emotion detected by VADER: ", emotion_vader)
+    print("Emotion detected by TextBlob: ", emotion_blob)
+    print("-" * 50)
